@@ -1,3 +1,4 @@
 pub mod diff;
 pub mod listener;
-pub mod notification;
+pub(crate) mod mutable_toast;
+pub mod toast;
