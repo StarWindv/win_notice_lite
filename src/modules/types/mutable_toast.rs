@@ -3,6 +3,9 @@ use pyo3::{PyResult, pyclass, pymethods};
 use serde::Serialize;
 use std::ops::Deref;
 
+/// 此类用于定义 Python 侧的可变通知对象
+///
+/// 相关字段定义同 Toast
 #[pyclass(from_py_object, get_all, set_all)]
 #[derive(Serialize, Clone, Debug)]
 pub struct MutableToast {
