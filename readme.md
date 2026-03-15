@@ -1,6 +1,6 @@
 # Windows-Notice-Lite
 
-[简体中文](./readme_cn.md)
+[简体中文](https://github.com/starwindv/win_notice_lite/blob/main/readme_cn.md)
 
 ## TOC
 

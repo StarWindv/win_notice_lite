@@ -4,9 +4,18 @@
 
 ---
 
+## 文档版本
+
+ - 0.0.4
+
+注意, 文档版本号跟随项目版本一同更迭.
+
+---
+
 ## 目录
 
 - [Python 侧 API 文档](#python-侧-api-文档)
+  - [文档版本](#文档版本)
   - [目录](#目录)
   - [一、介绍](#一介绍)
     - [1.1 导入](#11-导入)
@@ -69,9 +78,16 @@
         - [6.2.5.2 参数](#6252-参数)
         - [6.2.5.3 返回值](#6253-返回值)
         - [6.2.5.4 示例](#6254-示例)
+      - [6.2.6 generate\_fingerprint](#626-generate_fingerprint)
+        - [6.2.6.1 说明](#6261-说明)
+        - [6.2.6.2 参数](#6262-参数)
+        - [6.2.6.3 返回值](#6263-返回值)
   - [七、SerializeFormat](#七serializeformat)
     - [7.1 介绍](#71-介绍)
     - [7.2 枚举值](#72-枚举值)
+  - [八、ToastDict](#八toastdict)
+    - [8.1 介绍](#81-介绍)
+    - [8.2 属性](#82-属性)
 
 ---
 
@@ -183,7 +199,7 @@ async def main():
         case x if x != "Allowed": return
     toasts = await listener.get_all_notifications()
     for toast in toasts:
-        print(toast)
+        print(wnl.DiffTool.serialize_to(toast, wnl.SerializeFormat.Json))
 
 asyncio.run(main())
 ```
@@ -361,6 +377,7 @@ for toast in diff.new:
  - [`diff_without_time`](#623-diff_without_time)
  - [`to_json_str`](#624-to_json_str)
  - [`serialize_to`](#625-serialize_to)
+ - [`generate_fingerprint`](#626-generate_fingerprint)
 
 ---
 
@@ -479,6 +496,25 @@ print(yaml_str)
 
 ---
 
+#### 6.2.6 generate_fingerprint
+
+##### 6.2.6.1 说明
+
+将单个通知中的属性根据布尔值和定义的顺序用空格拼接起来后求对应字符串的 sha2-256 的方法
+
+##### 6.2.6.2 参数
+
+| 参数名            | 类型                 | 说明          |
+|----------------|--------------------|-------------|
+| `notif`        | [`Toast`](#三Toast) | 目标通知对象      |
+| `include_time` | `bool`             | 计算指纹时是否包含时间 |
+
+##### 6.2.6.3 返回值
+
+`str`: 生成的十六进制指纹
+
+---
+
 ## 七、SerializeFormat
 
 ### 7.1 介绍
@@ -493,8 +529,26 @@ print(yaml_str)
 |--------|---------|
 | `Json` | JSON 格式 |
 | `Yaml` | YAML 格式 |
-| `Toml` | TOML 格式 |
-| `XML`  | XML 格式  |
+
+---
+
+## 八、ToastDict
+
+### 8.1 介绍
+
+此类仅定义于 Python 代码中, 用于辅助`from_dict`方法做类型提示
+
+### 8.2 属性
+
+以下属性在`from_dict`方法使用时为可选, 其余属性与[Toast](#三Toast)完全相同
+```plaintext
+    hero_image_uri : Optional[str]
+    logo_uri       : Optional[str]
+    fingerprint    : Optional[str]
+    tag            : Optional[str]
+    group          : Optional[str]
+    fingerprint_without_time: Optional[str]
+```
 
 ---
 

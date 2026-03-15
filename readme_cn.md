@@ -1,6 +1,6 @@
 # Windows-Notice-Lite
 
-[English](./readme.md)
+[English](https://github.com/starwindv/win_notice_lite/blob/main/readme.md)
 
 ## 目录
 

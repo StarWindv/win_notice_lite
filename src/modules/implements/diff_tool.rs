@@ -1,12 +1,12 @@
 use super::super::types::diff::Diff;
 use super::super::types::diff_tool::DiffTool;
-use super::super::types::toast::Toast;
 use super::super::types::serialize_format::SerializeFormat;
-
-use pyo3::{pymethods, PyErr, PyResult};
+use super::super::types::toast::Toast;
 
 use std::collections::HashSet;
 
+use pyo3::{pymethods, PyErr, PyResult};
+use sha2::{Digest, Sha256};
 
 #[pymethods]
 impl DiffTool {
@@ -154,9 +154,46 @@ impl DiffTool {
     pub fn serialize_to(notifications: Vec<Toast>, to: SerializeFormat) -> Result<String, PyErr> {
         match to {
             SerializeFormat::Json => { Ok(serde_json::to_string_pretty(&notifications).unwrap_or_else(|_| "[]".to_string())) }
-            SerializeFormat::Toml => { Ok(toml::to_string_pretty(&notifications).unwrap_or_else(|_| "[]".to_string())) }
             SerializeFormat::Yaml => { Ok(serde_yaml::to_string(&notifications).unwrap_or_else(|_| "[]".to_string())) }
-            SerializeFormat::XML => { Ok(serde_xml_rs::to_string(&notifications).unwrap_or_else(|_| "[]".to_string())) }
         }
+    }
+
+    /// 生成通知指纹 (SHA256哈希)
+    ///
+    /// 逻辑
+    /// 1. 拼接除fingerprint/fingerprint_without_time外的所有字段 (空格分隔)
+    /// 2. include_time为true时, 拼接字段包含creation_time; 否则不包含
+    /// 3. 对拼接字符串做SHA256哈希, 输出十六进制字符串
+    ///
+    /// Arguments:
+    /// 
+    ///     notif: &Toast - 待生成指纹的通知对象
+    ///     include_time: bool - 是否包含创建时间到指纹中
+    ///
+    /// Returns:
+    /// 
+    ///     String: SHA256十六进制指纹字符串
+    #[staticmethod]
+    pub fn generate_fingerprint(notif: &Toast, include_time: bool) -> String {
+        let mut parts = vec![
+            notif.id.to_string(),
+            notif.name.clone(),
+            notif.logo_uri.clone(),
+            notif.title.clone(),
+            notif.message.clone(),
+            notif.hero_image_uri.clone(),
+            notif.inline_images.join(" "),
+            notif.tag.clone(),
+            notif.group.clone(),
+        ];
+        if include_time {
+            parts.push(notif.creation_time.clone());
+        }
+        let concat = parts.join(" ");
+
+        let mut hasher = Sha256::new();
+        hasher.update(concat.as_bytes());
+        let result = hasher.finalize();
+        format!("{:x}", result)
     }
 }

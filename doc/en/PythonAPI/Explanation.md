@@ -4,74 +4,90 @@ This document introduces how to use the compiled binary library.
 
 ---
 
+## Document Version
+
+- 0.0.4
+
+Note that the document version number is updated along with the project version.
+
+---
+
 ## Table of Contents
 
 - [Python-side API Documentation](#python-side-api-documentation)
-    - [Table of Contents](#table-of-contents)
-    - [I. Introduction](#i-introduction)
-        - [1.1 Import](#11-import)
-        - [1.2 Classes](#12-classes)
-    - [II. Listener](#ii-listener)
-        - [2.1 Introduction](#21-introduction)
-        - [2.2 Interfaces](#22-interfaces)
-            - [2.2.1 request\_permission](#221-request_permission)
-                - [2.2.1.1 Parameters](#2211-parameters)
-                - [2.2.1.2 Type](#2212-type)
-                - [2.2.1.3 Return Value](#2213-return-value)
-                - [2.2.1.4 Example](#2214-example)
-            - [2.2.2 get\_all\_notifications](#222-get_all_notifications)
-                - [2.2.2.1 Parameters](#2221-parameters)
-                - [2.2.2.2 Type](#2222-type)
-                - [2.2.2.3 Return Value](#2223-return-value)
-                - [2.2.2.4 Example](#2224-example)
-            - [2.2.3 register\_toast\_handler](#223-register_toast_handler)
-                - [2.2.3.1 Description](#2231-description)
-            - [2.2.4 unregister\_toast\_handler](#224-unregister_toast_handler)
-                - [2.2.4.1 Description](#2241-description)
-    - [III. Toast](#iii-toast)
-        - [3.1 Introduction](#31-introduction)
-        - [3.2 Interfaces](#32-interfaces)
-            - [3.2.1 `__init__`](#321-__init__)
-                - [3.2.1.1 Parameter Description](#3211-parameter-description)
-                - [3.2.1.2 Example](#3212-example)
-        - [3.3 Properties](#33-properties)
-        - [3.4 Fingerprint](#34-fingerprint)
-        - [3.5 Empty Field Description](#35-empty-field-description)
-    - [IV. MutableToast](#iv-mutabletoast)
-        - [4.1 Introduction](#41-introduction)
-    - [V. Diff](#v-diff)
-        - [5.1 Introduction](#51-introduction)
-        - [5.2 Properties](#52-properties)
-        - [5.3 Example](#53-example)
-    - [VI. DiffTool](#vi-difftool)
-        - [6.1 Introduction](#61-introduction)
-        - [6.2 Interfaces](#62-interfaces)
-            - [6.2.1 diff\_full](#621-diff_full)
-                - [6.2.1.1 Description](#6211-description)
-                - [6.2.1.2 Parameters](#6212-parameters)
-                - [6.2.1.3 Return Value](#6213-return-value)
-                - [6.2.1.4 Example](#6214-example)
-            - [6.2.2 diff\_by\_id](#622-diff_by_id)
-                - [6.2.2.1 Description](#6221-description)
-                - [6.2.2.2 Parameters](#6222-parameters)
-                - [6.2.2.3 Return Value](#6223-return-value)
-            - [6.2.3 diff\_without\_time](#623-diff_without_time)
-                - [6.2.3.1 Description](#6231-description)
-                - [6.2.3.2 Parameters](#6232-parameters)
-                - [6.2.3.3 Return Value](#6233-return-value)
-            - [6.2.4 to\_json\_str](#624-to_json_str)
-                - [6.2.4.1 Description](#6241-description)
-                - [6.2.4.2 Parameters](#6242-parameters)
-                - [6.2.4.3 Return Value](#6243-return-value)
-                - [6.2.4.4 Example](#6244-example)
-            - [6.2.5 serialize\_to](#625-serialize_to)
-                - [6.2.5.1 Description](#6251-description)
-                - [6.2.5.2 Parameters](#6252-parameters)
-                - [6.2.5.3 Return Value](#6253-return-value)
-                - [6.2.5.4 Example](#6254-example)
-    - [VII. SerializeFormat](#vii-serializeformat)
-        - [7.1 Introduction](#71-introduction)
-        - [7.2 Enum Values](#72-enum-values)
+  - [Document Version](#document-version)
+  - [Table of Contents](#table-of-contents)
+  - [I. Introduction](#i-introduction)
+    - [1.1 Import](#11-import)
+    - [1.2 Classes](#12-classes)
+  - [II. Listener](#ii-listener)
+    - [2.1 Introduction](#21-introduction)
+    - [2.2 Interfaces](#22-interfaces)
+      - [2.2.1 request\_permission](#221-request_permission)
+        - [2.2.1.1 Parameters](#2211-parameters)
+        - [2.2.1.2 Type](#2212-type)
+        - [2.2.1.3 Return Value](#2213-return-value)
+        - [2.2.1.4 Example](#2214-example)
+      - [2.2.2 get\_all\_notifications](#222-get_all_notifications)
+        - [2.2.2.1 Parameters](#2221-parameters)
+        - [2.2.2.2 Type](#2222-type)
+        - [2.2.2.3 Return Value](#2223-return-value)
+        - [2.2.2.4 Example](#2224-example)
+      - [2.2.3 register\_toast\_handler](#223-register_toast_handler)
+        - [2.2.3.1 Description](#2231-description)
+      - [2.2.4 unregister\_toast\_handler](#224-unregister_toast_handler)
+        - [2.2.4.1 Description](#2241-description)
+  - [III. Toast](#iii-toast)
+    - [3.1 Introduction](#31-introduction)
+    - [3.2 Interfaces](#32-interfaces)
+      - [3.2.1 `__init__`](#321-__init__)
+        - [3.2.1.1 Parameter Description](#3211-parameter-description)
+        - [3.2.1.2 Example](#3212-example)
+    - [3.3 Properties](#33-properties)
+    - [3.4 Fingerprint](#34-fingerprint)
+    - [3.5 Empty Field Description](#35-empty-field-description)
+  - [IV. MutableToast](#iv-mutabletoast)
+    - [4.1 Introduction](#41-introduction)
+  - [V. Diff](#v-diff)
+    - [5.1 Introduction](#51-introduction)
+    - [5.2 Properties](#52-properties)
+    - [5.3 Example](#53-example)
+  - [VI. DiffTool](#vi-difftool)
+    - [6.1 Introduction](#61-introduction)
+    - [6.2 Interfaces](#62-interfaces)
+      - [6.2.1 diff\_full](#621-diff_full)
+        - [6.2.1.1 Description](#6211-description)
+        - [6.2.1.2 Parameters](#6212-parameters)
+        - [6.2.1.3 Return Value](#6213-return-value)
+        - [6.2.1.4 Example](#6214-example)
+      - [6.2.2 diff\_by\_id](#622-diff_by_id)
+        - [6.2.2.1 Description](#6221-description)
+        - [6.2.2.2 Parameters](#6222-parameters)
+        - [6.2.2.3 Return Value](#6223-return-value)
+      - [6.2.3 diff\_without\_time](#623-diff_without_time)
+        - [6.2.3.1 Description](#6231-description)
+        - [6.2.3.2 Parameters](#6232-parameters)
+        - [6.2.3.3 Return Value](#6233-return-value)
+      - [6.2.4 to\_json\_str](#624-to_json_str)
+        - [6.2.4.1 Description](#6241-description)
+        - [6.2.4.2 Parameters](#6242-parameters)
+        - [6.2.4.3 Return Value](#6243-return-value)
+        - [6.2.4.4 Example](#6244-example)
+      - [6.2.5 serialize\_to](#625-serialize_to)
+        - [6.2.5.1 Description](#6251-description)
+        - [6.2.5.2 Parameters](#6252-parameters)
+        - [6.2.5.3 Return Value](#6253-return-value)
+        - [6.2.5.4 Example](#6254-example)
+      - [6.2.6 generate\_fingerprint](#626-generate_fingerprint)
+        - [6.2.6.1 Description](#6261-description)
+        - [6.2.6.2 Parameters](#6262-parameters)
+        - [6.2.6.3 Return Value](#6263-return-value)
+  - [VII. SerializeFormat](#vii-serializeformat)
+    - [7.1 Introduction](#71-introduction)
+    - [7.2 Enum Values](#72-enum-values)
+  - [VIII. ToastDict](#viii-toastdict)
+    - [8.1 Introduction](#81-introduction)
+    - [8.2 Attributes](#82-attributes)
 
 ---
 
@@ -479,6 +495,23 @@ print(yaml_str)
 
 ---
 
+#### 6.2.6 generate_fingerprint
+
+##### 6.2.6.1 Description
+A method that concatenates the attributes in a single notification with spaces according to the boolean values and the defined order, then computes the SHA-256 hash of the resulting string.
+
+##### 6.2.6.2 Parameters
+
+| Parameter Name | Type                  | Description                                            |
+|----------------|-----------------------|--------------------------------------------------------|
+| `notif`        | [`Toast`](#III-Toast) | Target notification object                             |
+| `include_time` | `bool`                | Whether to include time when computing the fingerprint |
+
+##### 6.2.6.3 Return Value
+`str`: The generated hexadecimal fingerprint
+
+---
+
 ## VII. SerializeFormat
 
 ### 7.1 Introduction
@@ -495,6 +528,24 @@ print(yaml_str)
 | `Yaml`     | YAML format     |
 | `Toml`     | TOML format     |
 | `XML`      | XML format      |
+
+---
+
+## VIII. ToastDict
+
+### 8.1 Introduction
+This class is defined **only** in Python code and is used to assist the `from_dict` method with type hinting.
+
+### 8.2 Attributes
+The following attributes are optional when used in the `from_dict` method; all other attributes are **identical** to those of [Toast](#III-Toast):
+```plaintext
+    hero_image_uri : Optional[str]
+    logo_uri       : Optional[str]
+    fingerprint    : Optional[str]
+    tag            : Optional[str]
+    group          : Optional[str]
+    fingerprint_without_time: Optional[str]
+```
 
 ---
 
