@@ -23,14 +23,16 @@ static RUNTIME: OnceLock<Runtime> = OnceLock::new();
 
 #[pymethods]
 impl Polling {
-    /// 创建一个新的 Polling 实例。
+    /// 创建一个新的 Polling 实例. 
     ///
     /// Args:
-    ///     listener (Listener): 用于获取通知的监听器实例。
-    ///     interval (int): 轮询间隔时间（毫秒）。
+    ///
+    ///     listener (Listener): 用于获取通知的监听器实例. 
+    ///     interval (int): 轮询间隔时间 (毫秒) . 
     ///
     /// Returns:
-    ///     Polling: 返回一个新的 Polling 对象。
+    ///
+    ///     Polling: 返回一个新的 Polling 对象. 
     #[new]
     pub fn new(listener: Listener, interval: i32) -> PyResult<Self> {
         Ok(Self {
@@ -42,15 +44,18 @@ impl Polling {
         })
     }
 
-    /// 注册一个全局轮询事件回调函数，该回调会接收所有类型的事件。
+    /// 注册一个全局轮询事件回调函数, 该回调会接收所有类型的事件. 
     ///
     /// Args:
-    ///     handler (Callable): 一个可调用对象，接收一个 Diff 参数。
+    ///
+    ///     handler (Callable): 一个可调用对象, 接收一个 Diff 参数. 
     ///
     /// Returns:
-    ///     CallbackToken: 用于后续取消注册的令牌。
+    ///
+    ///     CallbackToken: 用于后续取消注册的令牌. 
     ///
     /// Raises:
+    ///
     ///     TypeError: 如果 handler 不是可调用的函数
     pub fn register_polling_event_callback(
         &self,
@@ -68,15 +73,15 @@ impl Polling {
         Ok(token)
     }
 
-    /// 注销指定令牌对应的回调函数。
+    /// 注销指定令牌对应的回调函数. 
     ///
     /// Args:
     ///
-    ///     token (CallbackToken): 要取消注册的回调令牌。
+    ///     token (CallbackToken): 要取消注册的回调令牌. 
     ///
     /// Returns:
     ///
-    ///     PollingStatus: 返回 Success 如果成功移除，否则返回 Failed。
+    ///     PollingStatus: 返回 Success 如果成功移除, 否则返回 Failed. 
     pub fn unregister(&self, token: CallbackToken) -> PyResult<PollingStatus> {
         let mut reg = self.registry.lock().auto()?;
         if reg.remove(&token).is_some() {
@@ -86,17 +91,20 @@ impl Polling {
         }
     }
 
-    /// 注册一个仅针对特定事件类型的回调函数。
+    /// 注册一个仅针对特定事件类型的回调函数. 
     ///
     /// Args:
-    ///     handler (Callable): 接收 Diff 参数的可调用对象。
+    ///
+    ///     handler (Callable): 接收 Diff 参数的可调用对象. 
     ///     for_type (EventsType): 指定该回调只响应的通知类型
     ///
     /// Returns:
-    ///     CallbackToken: 用于后续取消注册的令牌。
+    ///
+    ///     CallbackToken: 用于后续取消注册的令牌. 
     ///
     /// Raises:
-    ///     TypeError: 如果 handler 不是可调用的。
+    ///
+    ///     TypeError: 如果 handler 不是可调用的. 
     pub fn on_type_callback(
         &self,
         handler: Bound<'_, PyAny>,
@@ -116,11 +124,11 @@ impl Polling {
 
     /// 启动事件循环, 并将可能的回调函数投入任务中
     ///
-    /// 如果轮询已经在运行，则立即返回 Success。
+    /// 如果轮询已经在运行, 则立即返回 Success. 
     ///
     /// Returns:
     ///
-    ///     PollingStatus: 返回 Success。
+    ///     PollingStatus: 返回 Success. 
     pub fn start_all(&self) -> PyResult<PollingStatus> {
         if self.running.load(Ordering::SeqCst) {
             return Ok(PollingStatus::Success);
@@ -140,25 +148,25 @@ impl Polling {
         Ok(PollingStatus::Success)
     }
 
-    /// 停止所有轮询任务。
+    /// 停止所有轮询任务. 
     ///
     /// Returns:
     ///
-    ///     PollingStatus: 返回 Success。
+    ///     PollingStatus: 返回 Success. 
     pub fn stop_all(&self) -> PyResult<PollingStatus> {
         self.running.store(false, Ordering::SeqCst);
         Ok(PollingStatus::Success)
     }
 
-    /// 激活指定令牌的回调函数，使其开始处理事件。
+    /// 激活指定令牌的回调函数, 使其开始处理事件. 
     ///
     /// Args:
     ///
-    ///     token (CallbackToken): 要激活的回调令牌。
+    ///     token (CallbackToken): 要激活的回调令牌. 
     ///
     /// Returns:
     ///
-    ///     PollingStatus: 如果找到该令牌则返回 Success，否则返回 Failed。
+    ///     PollingStatus: 如果找到该令牌则返回 Success, 否则返回 Failed. 
     pub fn polling_for(&self, token: CallbackToken) -> PyResult<PollingStatus> {
         let mut reg = self.registry.lock().auto()?;
         if let Some((_, _, active)) = reg.get_mut(&token) {
@@ -169,13 +177,15 @@ impl Polling {
         }
     }
 
-    /// 停止指定令牌的回调函数，使其不再处理事件。
+    /// 停止指定令牌的回调函数, 使其不再处理事件. 
     ///
     /// Args:
-    ///     token (CallbackToken): 要暂停的回调令牌。
+    ///
+    ///     token (CallbackToken): 要暂停的回调令牌. 
     ///
     /// Returns:
-    ///     PollingStatus: 如果找到该令牌则返回 Success，否则返回 Failed。
+    ///
+    ///     PollingStatus: 如果找到该令牌则返回 Success, 否则返回 Failed. 
     pub fn stop_for(&self, token: CallbackToken) -> PyResult<PollingStatus> {
         let mut reg = self.registry.lock().auto()?;
         if let Some((_, _, active)) = reg.get_mut(&token) {
@@ -186,11 +196,11 @@ impl Polling {
         }
     }
 
-    /// 动态修改轮询间隔时间。
+    /// 动态修改轮询间隔时间. 
     ///
     /// Args:
     ///
-    ///     interval (int): 新的轮询间隔时间（毫秒）。
+    ///     interval (int): 新的轮询间隔时间 (毫秒) . 
     pub fn change_interval(&mut self, interval: i32) {
         self.interval = interval;
         *self.interval_shared.lock().unwrap() = interval;

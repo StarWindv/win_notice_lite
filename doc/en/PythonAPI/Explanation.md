@@ -6,7 +6,7 @@ This document introduces how to use the compiled binary library.
 
 ## Document Version
 
-- 0.0.4
+- 0.1.0
 
 Note that the document version number is updated along with the project version.
 
@@ -33,9 +33,9 @@ Note that the document version number is updated along with the project version.
         - [2.2.2.2 Type](#2222-type)
         - [2.2.2.3 Return Value](#2223-return-value)
         - [2.2.2.4 Example](#2224-example)
-      - [2.2.3 register\_toast\_handler](#223-register_toast_handler)
+      - ~~[2.2.3 register\_toast\_handler](#223-register_toast_handler)~~
         - [2.2.3.1 Description](#2231-description)
-      - [2.2.4 unregister\_toast\_handler](#224-unregister_toast_handler)
+      - ~~[2.2.4 unregister\_toast\_handler](#224-unregister_toast_handler)~~
         - [2.2.4.1 Description](#2241-description)
   - [III. Toast](#iii-toast)
     - [3.1 Introduction](#31-introduction)
@@ -88,6 +88,54 @@ Note that the document version number is updated along with the project version.
   - [VIII. ToastDict](#viii-toastdict)
     - [8.1 Introduction](#81-introduction)
     - [8.2 Attributes](#82-attributes)
+- [IX. Polling](#ix-polling)
+  - [9.1 Introduction](#91-introduction)
+  - [9.2 Interfaces](#92-interfaces)
+    - [9.2.1 `__init__`](#921-__init__)
+      - [9.2.1.1 Parameters](#9211-parameters)
+      - [9.2.1.2 Return Value](#9212-return-value)
+      - [9.2.1.3 Example](#9213-example)
+    - [9.2.2 `register_polling_event_callback`](#922-register_polling_event_callback)
+      - [9.2.2.1 Description](#9221-description)
+      - [9.2.2.2 Parameters](#9222-parameters)
+      - [9.2.2.3 Return Value](#9223-return-value)
+      - [9.2.2.4 Example](#9224-example)
+    - [9.2.3 `unregister`](#923-unregister)
+      - [9.2.3.1 Description](#9231-description)
+      - [9.2.3.2 Parameters](#9232-parameters)
+      - [9.2.3.3 Return Value](#9233-return-value)
+    - [9.2.4 `on_type_callback`](#924-on_type_callback)
+      - [9.2.4.1 Description](#9241-description)
+      - [9.2.4.2 Parameters](#9242-parameters)
+      - [9.2.4.3 Return Value](#9243-return-value)
+      - [9.2.4.4 Example](#9244-example)
+    - [9.2.5 `start_all`](#925-start_all)
+      - [9.2.5.1 Description](#9251-description)
+      - [9.2.5.2 Return Value](#9252-return-value)
+    - [9.2.6 `stop_all`](#926-stop_all)
+      - [9.2.6.1 Description](#9261-description)
+      - [9.2.6.2 Return Value](#9262-return-value)
+    - [9.2.7 `polling_for`](#927-polling_for)
+      - [9.2.7.1 Description](#9271-description)
+      - [9.2.7.2 Parameters](#9272-parameters)
+      - [9.2.7.3 Return Value](#9273-return-value)
+    - [9.2.8 `stop_for`](#928-stop_for)
+      - [9.2.8.1 Description](#9281-description)
+      - [9.2.8.2 Parameters](#9282-parameters)
+      - [9.2.8.3 Return Value](#9283-return-value)
+    - [9.2.9 `change_interval`](#929-change_interval)
+      - [9.2.9.1 Description](#9291-description)
+      - [9.2.9.2 Parameters](#9292-parameters)
+      - [9.2.9.3 Example](#9293-example)
+- [X. CallbackToken](#x-callbacktoken)
+  - [10.1 Introduction](#101-introduction)
+  - [10.2 Properties](#102-properties)
+- [XI. PollingStatus](#xi-pollingstatus)
+  - [11.1 Introduction](#111-introduction)
+  - [11.2 Enumeration Values](#112-enumeration-values)
+- [XII. EventsType](#xii-eventstype)
+  - [12.1 Introduction](#121-introduction)
+  - [12.2 Enumeration Values](#122-enumeration-values)
 
 ---
 
@@ -212,6 +260,8 @@ asyncio.run(main())
 
 This interface was intended to provide callback registration in the form of event notifications but has not been officially added. See [here](../About_Event_Notification/Explanation.md) for details.
 
+We have provided a set of pseudo-event notification mechanisms based on Tokio polling, whose usage is similar to normal event notifications. For details, see [here](#IX-polling).
+
 ---
 
 #### 2.2.4 unregister_toast_handler
@@ -219,6 +269,8 @@ This interface was intended to provide callback registration in the form of even
 ##### 2.2.4.1 Description
 
 This interface was intended to provide a method for unregistering event notification callback functions but has not been officially added. See [here](../About_Event_Notification/Explanation.md) for details.
+
+We have provided a set of pseudo-event notification mechanisms based on Tokio polling, whose usage is similar to normal event notifications. For details, see [here](#IX-polling).
 
 ---
 
@@ -544,6 +596,263 @@ The following attributes are optional when used in the `from_dict` method; all o
     group          : Optional[str]
     fingerprint_without_time: Optional[str]
 ```
+
+---
+
+下面是你提供的整段技术文档**专业、准确、符合英文技术文档风格**的完整翻译, 格式与原文严格对应: 
+
+---
+
+# IX. Polling
+
+## 9.1 Introduction
+
+> Humans are not frogs in warm water; life never ceases. If there is a problem, we solve it ourselves!
+
+`Polling` is an event loop manager based on the polling mechanism. It continuously monitors changes in system notifications and triggers registered callback functions when changes are detected.
+It supports registering callbacks by event type (addition, removal, or all) and allows dynamic adjustment of the polling interval.
+
+---
+
+## 9.2 Interfaces
+
+This class provides the following interfaces:
+
+- [`__init__`](#921-__init__)
+- [`register_polling_event_callback`](#922-register_polling_event_callback)
+- [`unregister`](#923-unregister)
+- [`on_type_callback`](#924-on_type_callback)
+- [`start_all`](#925-start_all)
+- [`stop_all`](#926-stop_all)
+- [`polling_for`](#927-polling_for)
+- [`stop_for`](#928-stop_for)
+- [`change_interval`](#929-change_interval)
+
+---
+
+### 9.2.1 `__init__`
+
+#### 9.2.1.1 Parameters
+
+| Parameter  | Type       | Description                                   |
+|------------|------------|-----------------------------------------------|
+| `listener` | `Listener` | Listener instance for obtaining notifications |
+| `interval` | `int`      | Polling interval (unit: milliseconds)         |
+
+#### 9.2.1.2 Return Value
+
+Returns a new `Polling` instance.
+
+#### 9.2.1.3 Example
+
+```python
+import win_notice_lite as wnl
+
+listener = wnl.Listener()
+polling = wnl.Polling(listener, interval=1000)
+```
+
+---
+
+### 9.2.2 `register_polling_event_callback`
+
+#### 9.2.2.1 Description
+
+Registers a global callback function that receives all types of events (addition + removal).
+
+#### 9.2.2.2 Parameters
+
+| Parameter | Type       | Description                  |
+|-----------|------------|------------------------------|
+| `handler` | `Callable` | Accepts one `Diff` parameter |
+
+#### 9.2.2.3 Return Value
+
+Returns a [`CallbackToken`](#X-CallbackToken) token for subsequent unregistration.
+
+#### 9.2.2.4 Example
+
+```python
+def on_event(diff):
+    print(f"Added: {len(diff.new)}, Removed: {len(diff.remove)}")
+
+token = polling.register_polling_event_callback(on_event)
+```
+
+---
+
+### 9.2.3 `unregister`
+
+#### 9.2.3.1 Description
+
+Unregisters the callback function corresponding to the specified token.
+
+#### 9.2.3.2 Parameters
+
+| Parameter | Type            | Description           |
+|-----------|-----------------|-----------------------|
+| `token`   | `CallbackToken` | Callback token object |
+
+#### 9.2.3.3 Return Value
+
+Returns the [`PollingStatus`](#XI-PollingStatus) enumeration value:
+`Success` for success, `Failed` for failure.
+
+---
+
+### 9.2.4 `on_type_callback`
+
+#### 9.2.4.1 Description
+
+Registers a callback function for a specific event type only.
+
+#### 9.2.4.2 Parameters
+
+| Parameter  | Type         | Description                            |
+|------------|--------------|----------------------------------------|
+| `handler`  | `Callable`   | Accepts one `Diff` parameter           |
+| `for_type` | `EventsType` | Specifies the event type to respond to |
+
+#### 9.2.4.3 Return Value
+
+Returns a [`CallbackToken`](#X-CallbackToken) token.
+
+#### 9.2.4.4 Example
+
+```python
+def on_new(diff):
+    for toast in diff.new:
+        print(toast.title)
+
+token = polling.on_type_callback(on_new, wnl.EventsType.New)
+```
+
+---
+
+### 9.2.5 `start_all`
+
+#### 9.2.5.1 Description
+
+Starts the event loop and begins polling for notification changes to trigger callbacks.
+If polling is already running, it returns success immediately.
+
+#### 9.2.5.2 Return Value
+
+Returns [`PollingStatus.Success`](#XI-PollingStatus).
+
+---
+
+### 9.2.6 `stop_all`
+
+#### 9.2.6.1 Description
+
+Stops all polling tasks.
+
+#### 9.2.6.2 Return Value
+
+Returns [`PollingStatus.Success`](#XI-PollingStatus).
+
+---
+
+### 9.2.7 `polling_for`
+
+#### 9.2.7.1 Description
+
+Activates the callback function for the specified token so it starts processing events.
+
+#### 9.2.7.2 Parameters
+
+| Parameter | Type            | Description           |
+|-----------|-----------------|-----------------------|
+| `token`   | `CallbackToken` | Callback token object |
+
+#### 9.2.7.3 Return Value
+
+Returns [`PollingStatus`](#XI-PollingStatus).
+
+---
+
+### 9.2.8 `stop_for`
+
+#### 9.2.8.1 Description
+
+Pauses the callback function for the specified token so it no longer processes events.
+
+#### 9.2.8.2 Parameters
+
+| Parameter | Type            | Description           |
+|-----------|-----------------|-----------------------|
+| `token`   | `CallbackToken` | Callback token object |
+
+#### 9.2.8.3 Return Value
+
+Returns [`PollingStatus`](#XI-PollingStatus).
+
+---
+
+### 9.2.9 `change_interval`
+
+#### 9.2.9.1 Description
+
+Dynamically modifies the polling interval.
+
+#### 9.2.9.2 Parameters
+
+| Parameter  | Type  | Description                               |
+|------------|-------|-------------------------------------------|
+| `interval` | `int` | New polling interval (unit: milliseconds) |
+
+#### 9.2.9.3 Example
+
+```python
+polling.change_interval(2000)
+```
+
+---
+
+# X. CallbackToken
+
+## 10.1 Introduction
+
+`CallbackToken` is the unique identifier for each callback function.
+It is automatically generated by the system during registration and used for subsequent unregistration or controlling the enable/disable state of the callback.
+
+## 10.2 Properties
+
+| Property | Type  | Description       |
+|----------|-------|-------------------|
+| `id`     | `int` | Unique identifier |
+
+---
+
+# XI. PollingStatus
+
+## 11.1 Introduction
+
+`PollingStatus` is an enumeration type used to represent the result status of an operation.
+
+## 11.2 Enumeration Values
+
+| Value     | Description                      |
+|-----------|----------------------------------|
+| `Success` | Operation completed successfully |
+| `Failed`  | Operation failed                 |
+
+---
+
+# XII. EventsType
+
+## 12.1 Introduction
+
+`EventsType` is an enumeration type used to specify the event types that a callback function responds to.
+
+## 12.2 Enumeration Values
+
+| Value    | Description                                 |
+|----------|---------------------------------------------|
+| `New`    | Respond only to new notification events     |
+| `Remove` | Respond only to removed notification events |
+| `All`    | Respond to all event types (new + removed)  |
 
 ---
 

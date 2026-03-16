@@ -6,7 +6,7 @@
 
 ## 文档版本
 
- - 0.0.4
+ - 0.1.0
 
 注意, 文档版本号跟随项目版本一同更迭.
 
@@ -33,9 +33,9 @@
         - [2.2.2.2 类型](#2222-类型)
         - [2.2.2.3 返回值](#2223-返回值)
         - [2.2.2.4 示例](#2224-示例)
-      - [2.2.3 register\_toast\_handler](#223-register_toast_handler)
+      - ~~[2.2.3 register\_toast\_handler](#223-register_toast_handler)~~
         - [2.2.3.1 说明](#2231-说明)
-      - [2.2.4 unregister\_toast\_handler](#224-unregister_toast_handler)
+      - ~~[2.2.4 unregister\_toast\_handler](#224-unregister_toast_handler)~~
         - [2.2.4.1 说明](#2241-说明)
   - [三、Toast](#三toast)
     - [3.1 介绍](#31-介绍)
@@ -88,6 +88,54 @@
   - [八、ToastDict](#八toastdict)
     - [8.1 介绍](#81-介绍)
     - [8.2 属性](#82-属性)
+  - [九、Polling](#九polling)
+    - [9.1 介绍](#91-介绍)
+    - [9.2 接口](#92-接口)
+      - [9.2.1 `__init__`](#921-__init__)
+        - [9.2.1.1 参数](#9211-参数)
+        - [9.2.1.2 返回值](#9212-返回值)
+        - [9.2.1.3 示例](#9213-示例)
+      - [9.2.2 `register_polling_event_callback`](#922-register_polling_event_callback)
+        - [9.2.2.1 说明](#9221-说明)
+        - [9.2.2.2 参数](#9222-参数)
+        - [9.2.2.3 返回值](#9223-返回值)
+        - [9.2.2.4 示例](#9224-示例)
+      - [9.2.3 `unregister`](#923-unregister)
+        - [9.2.3.1 说明](#9231-说明)
+        - [9.2.3.2 参数](#9232-参数)
+        - [9.2.3.3 返回值](#9233-返回值)
+      - [9.2.4 `on_type_callback`](#924-on_type_callback)
+        - [9.2.4.1 说明](#9241-说明)
+        - [9.2.4.2 参数](#9242-参数)
+        - [9.2.4.3 返回值](#9243-返回值)
+        - [9.2.4.4 示例](#9244-示例)
+      - [9.2.5 `start_all`](#925-start_all)
+        - [9.2.5.1 说明](#9251-说明)
+        - [9.2.5.2 返回值](#9252-返回值)
+      - [9.2.6 `stop_all`](#926-stop_all)
+        - [9.2.6.1 说明](#9261-说明)
+        - [9.2.6.2 返回值](#9262-返回值)
+      - [9.2.7 `polling_for`](#927-polling_for)
+        - [9.2.7.1 说明](#9271-说明)
+        - [9.2.7.2 参数](#9272-参数)
+        - [9.2.7.3 返回值](#9273-返回值)
+      - [9.2.8 `stop_for`](#928-stop_for)
+        - [9.2.8.1 说明](#9281-说明)
+        - [9.2.8.2 参数](#9282-参数)
+        - [9.2.8.3 返回值](#9283-返回值)
+      - [9.2.9 `change_interval`](#929-change_interval)
+        - [9.2.9.1 说明](#9291-说明)
+        - [9.2.9.2 参数](#9292-参数)
+        - [9.2.9.3 示例](#9293-示例)
+  - [十、CallbackToken](#十callbacktoken)
+    - [10.1 介绍](#101-介绍)
+    - [10.2 属性](#102-属性)
+  - [十一、PollingStatus](#十一pollingstatus)
+    - [11.1 介绍](#111-介绍)
+    - [11.2 枚举值](#112-枚举值)
+  - [十二、EventsType](#十二eventstype)
+    - [12.1 介绍](#121-介绍)
+    - [12.2 枚举值](#122-枚举值)
 
 ---
 
@@ -212,6 +260,8 @@ asyncio.run(main())
 
 该接口旨在提供事件通知形式的回调注册, 但是并未正式加入, 详见[此处](../About_Event_Notification/Explanation.md)
 
+已提供一组基于 tokio 轮询的伪事件通知方法, 并且用法上也类似事件通知, 详见[此处](#九polling)
+
 ---
 
 #### 2.2.4 unregister_toast_handler
@@ -219,6 +269,8 @@ asyncio.run(main())
 ##### 2.2.4.1 说明
 
 该接口旨在提供事件通知回调函数的注销方法, 但是并未正式加入, 详见[此处](../About_Event_Notification/Explanation.md)
+
+已提供一组基于 tokio 轮询的伪事件通知方法, 并且用法上也类似事件通知, 详见[此处](#九polling)
 
 ---
 
@@ -549,6 +601,255 @@ print(yaml_str)
     group          : Optional[str]
     fingerprint_without_time: Optional[str]
 ```
+
+---
+
+## 九、Polling
+
+### 9.1 介绍
+
+> 人类不是温水里的青蛙, 生命永不止息, 有问题? 那我们九自己解决它!
+
+`Polling` 是一个基于轮询机制的事件循环管理器, 用于持续监听系统通知的变化, 并在检测到变化时触发注册的回调函数. 它支持按事件类型 (新增、移除或全部) 注册回调, 并支持动态调整轮询间隔. 
+
+---
+
+### 9.2 接口
+
+此类提供如下接口: 
+
+- [`__init__`](#921-__init__)
+- [`register_polling_event_callback`](#922-register_polling_event_callback)
+- [`unregister`](#923-unregister)
+- [`on_type_callback`](#924-on_type_callback)
+- [`start_all`](#925-start_all)
+- [`stop_all`](#926-stop_all)
+- [`polling_for`](#927-polling_for)
+- [`stop_for`](#928-stop_for)
+- [`change_interval`](#929-change_interval)
+
+---
+
+#### 9.2.1 `__init__`
+
+##### 9.2.1.1 参数
+
+| 参数名        | 类型         | 说明              |
+|------------|------------|-----------------|
+| `listener` | `Listener` | 用于获取通知的监听器实例    |
+| `interval` | `int`      | 轮询间隔时间 (单位: 毫秒) |
+
+##### 9.2.1.2 返回值
+
+返回一个新的 `Polling` 实例. 
+
+##### 9.2.1.3 示例
+
+```python
+import win_notice_lite as wnl
+
+listener = wnl.Listener()
+polling = wnl.Polling(listener, interval=1000)
+```
+
+---
+
+#### 9.2.2 `register_polling_event_callback`
+
+##### 9.2.2.1 说明
+
+注册一个全局回调函数, 该回调会接收所有类型的事件 (新增 + 移除) . 
+
+##### 9.2.2.2 参数
+
+| 参数名       | 类型         | 说明             |
+|-----------|------------|----------------|
+| `handler` | `Callable` | 接收一个 `Diff` 参数 |
+
+##### 9.2.2.3 返回值
+
+返回一个 [`CallbackToken`](#十CallbackToken) 令牌, 用于后续注销. 
+
+##### 9.2.2.4 示例
+
+```python
+def on_event(diff):
+    print(f"新增: {len(diff.new)}, 移除: {len(diff.remove)}")
+
+token = polling.register_polling_event_callback(on_event)
+```
+
+---
+
+#### 9.2.3 `unregister`
+
+##### 9.2.3.1 说明
+
+注销指定令牌对应的回调函数. 
+
+##### 9.2.3.2 参数
+
+| 参数名     | 类型              | 说明     |
+|---------|-----------------|--------|
+| `token` | `CallbackToken` | 回调令牌对象 |
+
+##### 9.2.3.3 返回值
+
+返回 [`PollingStatus`](#十一PollingStatus) 枚举值: `Success` 表示成功, `Failed` 表示失败. 
+
+---
+
+#### 9.2.4 `on_type_callback`
+
+##### 9.2.4.1 说明
+
+注册一个仅针对特定事件类型的回调函数. 
+
+##### 9.2.4.2 参数
+
+| 参数名        | 类型           | 说明             |
+|------------|--------------|----------------|
+| `handler`  | `Callable`   | 接收一个 `Diff` 参数 |
+| `for_type` | `EventsType` | 指定回调响应的事件类型    |
+
+##### 9.2.4.3 返回值
+
+返回一个 [`CallbackToken`](#十CallbackToken) 令牌. 
+
+##### 9.2.4.4 示例
+
+```python
+def on_new(diff):
+    for toast in diff.new:
+        print(toast.title)
+
+token = polling.on_type_callback(on_new, wnl.EventsType.New)
+```
+
+---
+
+#### 9.2.5 `start_all`
+
+##### 9.2.5.1 说明
+
+启动事件循环, 开始轮询通知变化并触发回调. 如果轮询已在运行, 则立即返回成功. 
+
+##### 9.2.5.2 返回值
+
+返回 [`PollingStatus.Success`](#十一PollingStatus). 
+
+---
+
+#### 9.2.6 `stop_all`
+
+##### 9.2.6.1 说明
+
+停止所有轮询任务. 
+
+##### 9.2.6.2 返回值
+
+返回 [`PollingStatus.Success`](#十一PollingStatus). 
+
+---
+
+#### 9.2.7 `polling_for`
+
+##### 9.2.7.1 说明
+
+激活指定令牌的回调函数, 使其开始处理事件. 
+
+##### 9.2.7.2 参数
+
+| 参数名     | 类型              | 说明     |
+|---------|-----------------|--------|
+| `token` | `CallbackToken` | 回调令牌对象 |
+
+##### 9.2.7.3 返回值
+
+返回 [`PollingStatus`](#十一PollingStatus). 
+
+---
+
+#### 9.2.8 `stop_for`
+
+##### 9.2.8.1 说明
+
+暂停指定令牌的回调函数, 使其不再处理事件. 
+
+##### 9.2.8.2 参数
+
+| 参数名     | 类型              | 说明     |
+|---------|-----------------|--------|
+| `token` | `CallbackToken` | 回调令牌对象 |
+
+##### 9.2.8.3 返回值
+
+返回 [`PollingStatus`](#十一PollingStatus). 
+
+---
+
+#### 9.2.9 `change_interval`
+
+##### 9.2.9.1 说明
+
+动态修改轮询间隔时间. 
+
+##### 9.2.9.2 参数
+
+| 参数名        | 类型    | 说明                |
+|------------|-------|-------------------|
+| `interval` | `int` | 新的轮询间隔时间 (单位: 毫秒) |
+
+##### 9.2.9.3 示例
+
+```python
+polling.change_interval(2000)
+```
+
+---
+
+## 十、CallbackToken
+
+### 10.1 介绍
+
+`CallbackToken` 是每个回调函数的唯一标识符, 由系统在注册时自动生成, 用于后续注销或控制回调的启用/禁用状态. 
+
+### 10.2 属性
+
+| 属性名  | 类型    | 说明    |
+|------|-------|-------|
+| `id` | `int` | 唯一标识符 |
+
+---
+
+## 十一、PollingStatus
+
+### 11.1 介绍
+
+`PollingStatus` 是一个枚举类型, 用于表示操作的结果状态. 
+
+### 11.2 枚举值
+
+| 枚举值       | 说明     |
+|-----------|--------|
+| `Success` | 操作成功完成 |
+| `Failed`  | 操作失败   |
+
+---
+
+## 十二、EventsType
+
+### 12.1 介绍
+
+`EventsType` 是一个枚举类型, 用于指定回调函数响应的事件类型. 
+
+### 12.2 枚举值
+
+| 枚举值      | 说明               |
+|----------|------------------|
+| `New`    | 仅响应新增通知事件        |
+| `Remove` | 仅响应移除通知事件        |
+| `All`    | 响应所有类型事件 (新增+移除) |
 
 ---
 

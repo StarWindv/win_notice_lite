@@ -130,7 +130,7 @@ Traceback (most recent call last):
   File "<python-input-4>", line 1, in <module>
     listener.register_toast_handler(lambda *_, **__: None)
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-RuntimeError: [WNL Error] 找不到元素。 (0x80070490)
+RuntimeError: [WNL Error] 找不到元素.  (0x80070490)
 ```
 
 它报错了! 但是为什么呢? 当时没有人知道, 我们把`windows crate`翻了个底朝天, 怀疑是不是自己代码写错了, 但终究一无所获
