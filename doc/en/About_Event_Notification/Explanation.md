@@ -1,16 +1,21 @@
 # About Event Notification Interface
 
-This document explains why an API for event notification and callback registration was not included.
+~~This document explains why an API for event notification and callback registration was not included.~~
+
+The issue has now been successfully resolved.<br>
+If Microsoft won't provide the API, I'll provide it.<br>  
+If Microsoft won't fix the bugs, I'll fix them!<br>
+[See details here](../PythonAPI/Explanation.md#IX-polling)
 
 ## Table of Contents
 
 - [About Event Notification Interface](#about-event-notification-interface)
-    - [Table of Contents](#table-of-contents)
-    - [Explanation](#explanation)
-        - [1.1 Historical Attempt](#11-historical-attempt)
-        - [1.2 Limitations](#12-limitations)
-        - [1.3 Other Attempts](#13-other-attempts)
-        - [1.4 Outcome](#14-outcome)
+  - [Table of Contents](#table-of-contents)
+  - [Explanation](#explanation)
+    - [1.1 Historical Attempt](#11-historical-attempt)
+    - [1.2 Limitations](#12-limitations)
+    - [1.3 Other Attempts](#13-other-attempts)
+    - [1.4 Outcome](#14-outcome)
 
 ---
 
